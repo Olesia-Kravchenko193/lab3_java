@@ -1,78 +1,38 @@
 package com.company;
+
 import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.*;
-import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.io.FileReader;
-
 
 public class Database {
-    public ArrayList<Product> list;
-
-    public Database() {
-        list = new ArrayList<>();
-    }
-
-    public void add(Product product) {
-        this.list.add(product);
-    }
-    public  void  add(String name, int number, String price, String year, String manufacturer){
-        this.list.add(new Product(name,number,price,year,manufacturer));
-    }
-
-    public Product get(int index) {
-        return this.list.get(index);
-    }
-
-    public Product remove(int index) {
-        return this.list.remove(index);
-    }
+    List<Product> dblist;
 
     @Override
     public String toString() {
-        return "Database{" + list + '}';
+        return "Database{" + Products.list + '}';
     }
 
-    //нативная сериализация
-    public static void SerializationSave(String filename) {
-        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(filename))) {
-            objectOutputStream.writeObject(list);
-        } catch (IOException e) {
-            System.out.println("Ошибка записи: " + e);
-        }
-    }
-
-    public static void SerializationLoad(String filename) {
-        Products.list.clear();
-        try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(filename))) {
-            list=((ArrayList<Product>)objectInputStream.readObject());
-        } catch (Exception ex) {
-            System.out.println(ex.getMessage());
-        }
-    }
-
-    //сериализация CSV
-    public void CSV_save(String filename) throws IOException {
+    //сериализация
+    public void save(String filename) throws IOException {
         FileWriter outStream = new FileWriter(filename);
         BufferedWriter bw = new BufferedWriter(outStream);
-        bw.write("Name;Number;Price;Year;Manufacturer;");
-        bw.write(System.lineSeparator());
-        for (Product product : list) {
+        for (Product product : Products.list) {
             try {
-                bw.write(product.getName() + ";");
-                bw.write(product.getNumber() + ";");
-                bw.write(product.getPrice() + ";");
-                bw.write(product.getYear() + ";");
-                bw.write(product.getManufacturer() + ";");
+                bw.write(product.getName());
+                bw.write(System.lineSeparator());
+                bw.write(String.valueOf(product.getNumber()));
+                bw.write(System.lineSeparator());
+                bw.write(product.getPrice());
+                bw.write(System.lineSeparator());
+                bw.write(product.getYear());
+                bw.write(System.lineSeparator());
+                bw.write(product.getManufacturer());
+                bw.write(System.lineSeparator());
+                bw.write("--------------------");
                 bw.write(System.lineSeparator());
             } catch (IOException e) {
                 e.printStackTrace();
@@ -82,37 +42,79 @@ public class Database {
         outStream.close();
     }
 
-    public static void CSV_load(String filename) throws IOException, ParseException {
+    public void load(String filename) throws IOException {
         Products.list.clear();
         Scanner scanner = new Scanner(new FileReader(filename));
-        String str;
-        scanner.nextLine();
         while (scanner.hasNextLine()) {
-            str=scanner.nextLine();
-            String[] strings = str.split(";");
-            list.add(new Product())
-
+            Product product = new Product();
+            product.setName(scanner.nextLine());
+            product.setNumber(Integer.parseInt(scanner.nextLine()));
+            product.setPrice(scanner.nextLine());
+            product.setYear(scanner.nextLine());
+            product.setManufacturer(scanner.nextLine());
+            scanner.nextLine();
+            Products.list.add(product);
         }
         scanner.close();
     }
 
-    //сериализация JSON
-    public static void JSON_save (String filename) throws IOException {
+    public void serialize(String filename) {
+        try {
+            FileOutputStream fileOut = new FileOutputStream(filename);
+            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+            out.writeObject(Products.list);
+            out.close();
+            fileOut.close();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public void deserialize(String filename) {
+        try {
+            FileInputStream fileIn = new FileInputStream(filename);
+            ObjectInputStream in = new ObjectInputStream(fileIn);
+            Products.list = (ArrayList<Product>) in.readObject();
+            in.close();
+            fileIn.close();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } catch (ClassNotFoundException c) {
+            System.out.println("Product class not found");
+            c.printStackTrace();
+        }
+    }
+
+    public void jacksonSerialize(String filename) throws IOException {
+        this.dblist=Products.list;
+        new ObjectMapper().writeValue(new File(filename), this);
+    }
+
+    public void jacksonDeserialize(String filename) throws IOException {
+        Database db1 = new ObjectMapper().readValue(new File(filename), Database.class);
+        this.dblist = db1.dblist;
+    }
+
+    public void serializeFastJSON(String filename) throws IOException {
         FileWriter outStream = new FileWriter(filename);
         BufferedWriter bw = new BufferedWriter(outStream);
-        bw.write(JSON.toJSONString(list, true));
+        bw.write(JSON.toJSONString(Products.list));
         bw.close();
         outStream.close();
     }
 
-    public static void JSON_load(String filename) {
-        Products.list.clear();
-        try (Stream<String> lines = Files.lines(Paths.get(filename))) {
-            String content = lines.collect(Collectors.joining());
-            Products.list = JSON.parseArray(content, Product.class);
-        } catch (IOException e) {
-            e.printStackTrace();
+/*    public void deserializeFastJSON(String filename) throws IOException {
+        Scanner scanner = new Scanner(new FileReader(filename));
+        this.clear();
+        ArrayList<JSONObject> JSONlist = JSON.parseObject(scanner.nextLine(), ArrayList.class);
+        for (JSONObject st : JSONlist) {
+            this.add(new Product(st.getString("name"), st.getIntValue("number"), st.getString("price"), st.getString("year"), st.getString("manufacturer")));
         }
+        scanner.close();
+    }*/
+
+    public void add(Product product) {
+        Products.list.add(product);
     }
 
 

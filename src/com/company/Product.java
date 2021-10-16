@@ -8,14 +8,6 @@ public class Product implements Serializable {
     private String year;
     private String manufacturer;
 
-    public Product(String name, int number, String price, String year, String manufacturer) {
-        this.name=name;
-        this.number=number;
-        this.price=price;
-        this.year=year;
-        this.manufacturer=manufacturer;
-    }
-
     public void setName(String name) {
         this.name = name;
     }

@@ -4,15 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Products {
-    static List<Product> list = new ArrayList<>();
+    public static List<Product> list;
 
-    public  static  Product getMax(){
-        Product max_count = new Product("",0,"","","");
+    public  static  List<Product> getMax(){
+        List<Product> maxCountProducts = new ArrayList<>();
+        int max_count = 0;
         for (Product product : list) {
-            if (product.getNumber() > max_count.getNumber()) {
-                max_count = product;
+            if (product.getNumber() > max_count) {
+                max_count = product.getNumber();
             }
         }
-        return max_count;
+        for (Product product : list) {
+            if (product.getNumber() == max_count) maxCountProducts.add(product);
+        }
+        return maxCountProducts;
     }
 }
