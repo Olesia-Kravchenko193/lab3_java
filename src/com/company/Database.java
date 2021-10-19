@@ -1,6 +1,7 @@
 package com.company;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.*;
@@ -9,18 +10,18 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Database {
-    List<Product> dblist;
+    static List<Product> dbList = Products.list;
 
     @Override
     public String toString() {
-        return "Database{" + Products.list + '}';
+        return "Database{" + dbList + '}';
     }
 
     //сериализация
     public void save(String filename) throws IOException {
         FileWriter outStream = new FileWriter(filename);
         BufferedWriter bw = new BufferedWriter(outStream);
-        for (Product product : Products.list) {
+        for (Product product : dbList) {
             try {
                 bw.write(product.getName());
                 bw.write(System.lineSeparator());
@@ -43,7 +44,7 @@ public class Database {
     }
 
     public void load(String filename) throws IOException {
-        Products.list.clear();
+        dbList.clear();
         Scanner scanner = new Scanner(new FileReader(filename));
         while (scanner.hasNextLine()) {
             Product product = new Product();
@@ -53,7 +54,7 @@ public class Database {
             product.setYear(scanner.nextLine());
             product.setManufacturer(scanner.nextLine());
             scanner.nextLine();
-            Products.list.add(product);
+            dbList.add(product);
         }
         scanner.close();
     }
@@ -62,7 +63,7 @@ public class Database {
         try {
             FileOutputStream fileOut = new FileOutputStream(filename);
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
-            out.writeObject(Products.list);
+            out.writeObject(dbList);
             out.close();
             fileOut.close();
         } catch (IOException ex) {
@@ -74,7 +75,7 @@ public class Database {
         try {
             FileInputStream fileIn = new FileInputStream(filename);
             ObjectInputStream in = new ObjectInputStream(fileIn);
-            Products.list = (ArrayList<Product>) in.readObject();
+            dbList = (ArrayList<Product>) in.readObject();
             in.close();
             fileIn.close();
         } catch (IOException ex) {
@@ -86,32 +87,31 @@ public class Database {
     }
 
     public void jacksonSerialize(String filename) throws IOException {
-        this.dblist=Products.list;
         new ObjectMapper().writeValue(new File(filename), this);
     }
 
     public void jacksonDeserialize(String filename) throws IOException {
         Database db1 = new ObjectMapper().readValue(new File(filename), Database.class);
-        this.dblist = db1.dblist;
+        this.dbList = db1.dbList;
     }
 
     public void serializeFastJSON(String filename) throws IOException {
         FileWriter outStream = new FileWriter(filename);
         BufferedWriter bw = new BufferedWriter(outStream);
-        bw.write(JSON.toJSONString(Products.list));
+        bw.write(JSON.toJSONString(dbList));
         bw.close();
         outStream.close();
     }
 
-/*    public void deserializeFastJSON(String filename) throws IOException {
+    public void deserializeFastJSON(String filename) throws IOException {
         Scanner scanner = new Scanner(new FileReader(filename));
-        this.clear();
+        dbList.clear();
         ArrayList<JSONObject> JSONlist = JSON.parseObject(scanner.nextLine(), ArrayList.class);
         for (JSONObject st : JSONlist) {
             this.add(new Product(st.getString("name"), st.getIntValue("number"), st.getString("price"), st.getString("year"), st.getString("manufacturer")));
         }
         scanner.close();
-    }*/
+    }
 
     public void add(Product product) {
         Products.list.add(product);
