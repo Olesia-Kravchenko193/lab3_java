@@ -10,8 +10,11 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Database {
-    static List<Product> dbList = Products.list;
+    List<Product> dbList;
 
+    public Database(){
+        dbList = Products.list;
+    }
     @Override
     public String toString() {
         return "Database{" + dbList + '}';
