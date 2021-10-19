@@ -10,7 +10,6 @@ public class Main {
    Определить товар, количество которого больше всего
    на складе, и напечатать все сведения о нем.*/
         Scanner scanner = new Scanner(System.in);
-        Database db = new Database();
         int size;
         do {
             System.out.print("Введите кол-во продуктов: ");
@@ -46,36 +45,22 @@ public class Main {
             System.out.println(product);
         }
 
-        long timeStart = System.currentTimeMillis(), t1, t2, t3, t4;
-        timeStart=System.currentTimeMillis();
+        Database db = new Database();
+        //Text format Save/load
         db.save("db.txt");
         db.load("db.txt");
-        /*System.out.println("native:");
-        for (Product product : Products.list) {
-            System.out.println(product);
-        }*/
-        t1=System.currentTimeMillis()-timeStart;
 
-        timeStart = System.currentTimeMillis();
+        //Java serialization/des
         db.serialize("db_s.txt");
         db.deserialize("db_s.txt");
-        t2=System.currentTimeMillis()-timeStart;
 
-        timeStart = System.currentTimeMillis();
-        db.jacksonSerialize("students.json");
-        db.jacksonDeserialize("students.json");
-        t3=System.currentTimeMillis()-timeStart;
+        //Jackson serialization/des
+       /* db.jacksonSerialize("students.json");
+        db.jacksonDeserialize("students.json");*/
 
-        timeStart = System.currentTimeMillis();
+        //FASTJson serialization/des
         db.serializeFastJSON("db_fastjson.txt");
         db.deserializeFastJSON("db_fastjson.txt");
-        t4=System.currentTimeMillis()-timeStart;
-
-        System.out.println("Text format Save/load:		" + t1 + " ms");
-        System.out.println("Java serialization/des:		" + t2 + " ms");
-        System.out.println("Jackson serialization/des:	" + t3 + " ms");
-        System.out.println("FASTJson serialization/des:	" + t4 + " ms");
-
 
     }
 
