@@ -55,13 +55,12 @@ public class Main {
         db.deserialize("db_s.txt");
 
         //Jackson serialization/des
-       /* db.jacksonSerialize("students.json");
-        db.jacksonDeserialize("students.json");*/
+        db.jacksonSerialize("students.json");
+        db.jacksonDeserialize("students.json");
 
         //FASTJson serialization/des
-        db.serializeFastJSON("db_fastjson.txt");
-        db.deserializeFastJSON("db_fastjson.txt");
-
+        db.serializeFastJSON("db_fastjson.json");
+        db.deserializeFastJSON("db_fastjson.json");
     }
 
 }

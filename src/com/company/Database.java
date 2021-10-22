@@ -20,7 +20,6 @@ public class Database {
         return "Database{" + dbList + '}';
     }
 
-    //сериализация
     public void save(String filename) throws IOException {
         FileWriter outStream = new FileWriter(filename);
         BufferedWriter bw = new BufferedWriter(outStream);
