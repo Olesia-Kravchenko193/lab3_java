@@ -2,6 +2,7 @@ package com.company;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.*;
@@ -9,12 +10,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class Database {
+public class Database implements Serializable {
+    @JsonProperty("wrapper")
     List<Product> dbList;
 
-    public Database(){
+    public Database() {
         dbList = Products.list;
     }
+
     @Override
     public String toString() {
         return "Database{" + dbList + '}';
@@ -108,7 +111,7 @@ public class Database {
     public void deserializeFastJSON(String filename) throws IOException {
         Scanner scanner = new Scanner(new FileReader(filename));
         dbList.clear();
-        ArrayList<JSONObject> JSONlist = JSON.parseObject(scanner.nextLine(), ArrayList.class);
+        List <JSONObject>JSONlist = JSON.parseObject(scanner.nextLine(), ArrayList.class);
         for (JSONObject st : JSONlist) {
             this.add(new Product(st.getString("name"), st.getIntValue("number"), st.getString("price"), st.getString("year"), st.getString("manufacturer")));
         }
